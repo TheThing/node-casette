@@ -1,0 +1,29 @@
+{
+  "name": "casette",
+  "version": "0.9.0",
+  "description": "No-dependancy test framework for node",
+  "main": "index.js",
+  "scripts": {
+    "test": "node cli.mjs test/**/*.test.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TheThing/node-casette.git"
+  },
+  "keywords": [
+    "test",
+    "unit",
+    "test",
+    "testing"
+  ],
+  "type": "module",
+  "author": "Jonatan Nilsson",
+  "license": "WTFPL",
+  "bugs": {
+    "url": "https://github.com/TheThing/node-casette/issues"
+  },
+  "homepage": "https://github.com/TheThing/node-casette#readme",
+  "bin": {
+    "casette": "./cli.mjs"
+  }
+}
