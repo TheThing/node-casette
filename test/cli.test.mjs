@@ -1,11 +1,11 @@
-import e from '../lib/eltro.mjs'
+import t from '../lib/eltro.mjs'
 import assert from '../lib/assert.mjs'
 import { CLI, getFiles, fileMatches } from '../lib/cli.mjs'
 
-e.describe('CLI', function() {
+t.describe('CLI', function() {
   let cli = new CLI()
 
-  e.test('#constructor() give default options', function() {
+  t.test('#constructor() give default options', function() {
     assert.strictEqual(cli.reporter, 'list')
     assert.deepEqual(cli.targets, ['test/**'])
     assert.deepEqual(cli.files, [])
@@ -16,69 +16,69 @@ e.describe('CLI', function() {
    * #parseOptions()
    *****************************************/
 
-  e.describe('#parseOptions()', function() {
-    e.test('should not do anything if no options', function() {
+  t.describe('#parseOptions()', function() {
+    t.test('should not do anything if no options', function() {
       cli.reporter = 'list'
       cli.parseOptions([])
       assert.strictEqual(cli.reporter, 'list')
       assert.notOk(cli.errored)
     })
 
-    e.test('should support overriding reporter with shorthand option', function() {
+    t.test('should support overriding reporter with shorthand option', function() {
       cli.reporter = 'list'
       cli.parseOptions(['-r', 'dot'])
       assert.strictEqual(cli.reporter, 'dot')
       assert.notOk(cli.errored)
     })
 
-    e.test('should support overriding reporter with long option', function() {
+    t.test('should support overriding reporter with long option', function() {
       cli.reporter = 'list'
       cli.parseOptions(['--reporter', 'dot'])
       assert.strictEqual(cli.reporter, 'dot')
       assert.notOk(cli.errored)
     })
 
-    e.test('should support reporter list', function() {
+    t.test('should support reporter list', function() {
       cli.reporter = 'list'
       cli.parseOptions(['-r', 'list'])
       assert.strictEqual(cli.reporter, 'list')
       assert.notOk(cli.errored)
     })
 
-    e.test('should mark errored if missing reporter', function() {
+    t.test('should mark errored if missing reporter', function() {
       cli.parseOptions(['--reporter'])
       assert.ok(cli.errored)
     })
 
-    e.test('should mark errored if invalid reporter', function() {
+    t.test('should mark errored if invalid reporter', function() {
       cli.parseOptions(['--reporter', 'test'])
       assert.ok(cli.errored)
     })
 
-    e.test('should add file to targets', function() {
+    t.test('should add file to targets', function() {
       cli.parseOptions(['test'])
       assert.deepEqual(cli.targets, ['test'])
       assert.notOk(cli.errored)
     })
 
-    e.test('should add file to targets no matter where it is', function() {
+    t.test('should add file to targets no matter where it is', function() {
       cli.parseOptions(['test', '-r', 'list', 'test2'])
       assert.deepEqual(cli.targets, ['test', 'test2'])
       assert.notOk(cli.errored)
     })
 
-    e.test('should default add test to target if no target', function() {
+    t.test('should default add test to target if no target', function() {
       cli.parseOptions(['-r', 'list'])
       assert.deepEqual(cli.targets, ['test/**'])
       assert.notOk(cli.errored)
     })
 
-    e.test('should mark errored if invalid shorthand option', function() {
+    t.test('should mark errored if invalid shorthand option', function() {
       cli.parseOptions(['-A'])
       assert.ok(cli.errored)
     })
 
-    e.test('should mark errored if invalid longhand option', function() {
+    t.test('should mark errored if invalid longhand option', function() {
       cli.parseOptions(['--asdf'])
       assert.ok(cli.errored)
     })
@@ -88,8 +88,8 @@ e.describe('CLI', function() {
    * #processTargets()
    *****************************************/
 
-  e.describe('#processTargets()', function() {
-    e.test('should mark errored if empty', async function() {
+  t.describe('#processTargets()', function() {
+    t.test('should mark errored if empty', async function() {
       cli.targets = ['test/folder1/*.txt']
       await cli.processTargets()
     
@@ -97,7 +97,7 @@ e.describe('CLI', function() {
       assert.ok(cli.errored)
     })
 
-    e.test('should support direct file path if exists', async function() {
+    t.test('should support direct file path if exists', async function() {
       cli.targets = ['test/folder1/sampletest1.temp.mjs']
       await cli.processTargets()
     
@@ -105,7 +105,7 @@ e.describe('CLI', function() {
       assert.strictEqual(cli.files[0], 'test/folder1/sampletest1.temp.mjs')
     })
     
-    e.test('should return all files in a directory', async function() {
+    t.test('should return all files in a directory', async function() {
       cli.targets = ['test/folder1/']
       await cli.processTargets()
     
@@ -114,7 +114,7 @@ e.describe('CLI', function() {
       assert.strictEqual(cli.files[1], 'test/folder1/sampletest2.temp.mjs')
     })
     
-    e.test('should support start as folder substitute', async function() {
+    t.test('should support start as folder substitute', async function() {
       cli.targets = ['*/folder1/']
       await cli.processTargets()
     
@@ -123,7 +123,7 @@ e.describe('CLI', function() {
       assert.strictEqual(cli.files[1], 'test/folder1/sampletest2.temp.mjs')
     })
     
-    e.test('should support grabbing only files in folder', async function() {
+    t.test('should support grabbing only files in folder', async function() {
       cli.targets = ['test/*']
       await cli.processTargets()
     
@@ -134,7 +134,7 @@ e.describe('CLI', function() {
       }
     })
     
-    e.test('should support grabbing only pattern files in folder', async function() {
+    t.test('should support grabbing only pattern files in folder', async function() {
       cli.targets = ['test/*.test.mjs']
       await cli.processTargets()
     
@@ -145,7 +145,7 @@ e.describe('CLI', function() {
       }
     })
     
-    e.test('should support multiple star pattern', async function() {
+    t.test('should support multiple star pattern', async function() {
       cli.targets = ['test/*/*.mjs']
       await cli.processTargets()
     
@@ -171,7 +171,7 @@ e.describe('CLI', function() {
       ])
     })
     
-    e.test('should support double star pattern', async function() {
+    t.test('should support double star pattern', async function() {
       cli.targets = ['test/**/*.mjs']
       await cli.processTargets()
     
@@ -217,7 +217,7 @@ e.describe('CLI', function() {
       })
     })
     
-    e.test('should support double star pattern end', async function() {
+    t.test('should support double star pattern end', async function() {
       cli.targets = ['test/**']
       await cli.processTargets()
     
@@ -265,7 +265,7 @@ e.describe('CLI', function() {
   })  
 })
 
-e.test('#fileMatches() should support filename matching with glob pattern', async function() {
+t.test('#fileMatches() should support filename matching with glob pattern', async function() {
   assert.ok(fileMatches('bla.test.mjs', '*.mjs'))
   assert.ok(fileMatches('bla.test.mjs', '*test.mjs'))
   assert.ok(fileMatches('bla.test.mjs', 'bla*.mjs'))
