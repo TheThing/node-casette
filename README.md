@@ -155,9 +155,29 @@ will output:
     √ #someFunction() should always return true
 ```
 
+### t.test(...).only()
+
+Eltro supports exclusivity when running tests. When specified, only tests marked with only will be run.
+
+You can do exclusivity on tests by adding `.only()` after or before the test like so:
+
+```node
+t.test('Only run this test', function() {
+  assert.strictEqual(true, true)
+}).only()
+```
+
+or like so:
+
+```node
+t.only().test('Only run this test', function() {
+  assert.strictEqual(true, true)
+})
+```
+
 ### t.test(...).skip()
 
-You can skip tests easily by adding `.skip()` after the test like so:
+You can skip tests easily by adding `.skip()` before or after the test like so:
 
 ```node
 t.test('Skip due to something being broken', function() {
@@ -165,12 +185,24 @@ t.test('Skip due to something being broken', function() {
 }).skip()
 ```
 
+or like so:
+
+```node
+t.skip().test('Skip this', function() { ... })
+```
+
 ### t.test(...).timeout(dur)
 
-Tests can take a long timt. By default, eltro will cancel a test if it takes longer than 2 seconds. You can however override this by calling the timeout function after the test with the specified duration in milliseconds like so:
+Tests can take a long time. By default, eltro will cancel a test if it takes longer than 2 seconds. You can however override this by calling the timeout function after or before the test with the specified duration in milliseconds like so:
 
 ```node
 t.test('This is a really long test', async function() {
   await DoSomethingForReallyLongTime()
 }).timeout(5000) // 5 seconds
+```
+
+or like so:
+
+```node
+t.timeout(5000).test('A long test', async function() { ... })
 ```

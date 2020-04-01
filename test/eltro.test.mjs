@@ -180,6 +180,56 @@ e.test('Eltro should support skipped tests', async function() {
   assert.strictEqual(t.failedTests.length, 0)
 })
 
+e.test('Eltro should support only tests', async function() {
+  testsWereRun = true
+  let assertIsTrue = false
+  const t = CreateT()
+  t.begin()
+  t.test('a', function() { throw new Error('Should not be called') })
+  t.test('b', function() { throw new Error('Should not be called') })
+  t.test('c', function() { assertIsTrue = true }).only()
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 0)
+  assert.strictEqual(assertIsTrue, true)
+})
+
+e.test('Eltro should support timed out tests in front', async function() {
+  testsWereRun = true
+  const t = CreateT()
+  t.begin()
+  t.timeout(25).test('', function(cb) { setTimeout(cb, 50) })
+  t.test('', function(cb) { setTimeout(cb, 50) })
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 1)
+  assert.ok(t.failedTests[0].error)
+  assert.match(t.failedTests[0].error.message, /25ms/)
+})
+
+e.test('Eltro should support skipped tests in front of the test', async function() {
+  testsWereRun = true
+  let assertIsTrue = false
+  const t = CreateT()
+  t.begin()
+  t.skip().test('', function() { throw new Error('Should not be called') })
+  t.test('', function() { assertIsTrue = true })
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 0)
+  assert.strictEqual(assertIsTrue, true)
+})
+
+e.test('Eltro should support only tests in front of the test', async function() {
+  testsWereRun = true
+  let assertIsTrue = false
+  const t = CreateT()
+  t.begin()
+  t.test('a', function() { throw new Error('Should not be called') })
+  t.only().test('b', function() { assertIsTrue = true })
+  t.test('c', function() { throw new Error('Should not be called') })
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 0)
+  assert.strictEqual(assertIsTrue, true)
+})
+
 // Extra testing to make sure tests were run at all
 process.on('exit', function(e) {
   try {
