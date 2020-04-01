@@ -230,6 +230,165 @@ e.test('Eltro should support only tests in front of the test', async function() 
   assert.strictEqual(assertIsTrue, true)
 })
 
+e.test('Eltro should support timed out describes', async function() {
+  testsWereRun = true
+  const t = CreateT()
+  t.begin()
+  t.timeout(10).describe('', function() {
+    t.test('', function(cb) { setTimeout(cb, 25) })
+    t.test('', function(cb) { setTimeout(cb, 25) })
+  })
+  t.describe('', function() {
+    t.test('', function(cb) { setTimeout(cb, 25) })
+  })
+  t.test('', function(cb) { setTimeout(cb, 25) })
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 2)
+  assert.ok(t.failedTests[0].error)
+  assert.match(t.failedTests[0].error.message, /10ms/)
+  assert.ok(t.failedTests[1].error)
+  assert.match(t.failedTests[1].error.message, /10ms/)
+})
+
+e.test('Eltro should support skipped tests in describe', async function() {
+  testsWereRun = true
+  let assertRan = 0
+  const t = CreateT()
+  t.begin()
+  t.skip().describe('', function() {
+    t.test('', function() { throw new Error('Should not be called') })
+    t.test('', function() { throw new Error('Should not be called') })
+    t.test('', function() { throw new Error('Should not be called') })
+  })
+  t.describe('', function() {
+    t.test('', function() { assertRan++ })
+  })
+  t.test('', function() { assertRan++ })
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 0)
+  assert.strictEqual(assertRan, 2)
+})
+
+e.test('Eltro should have skip at higher importance than only', async function() {
+  testsWereRun = true
+  let assertRan = 0
+  const t = CreateT()
+  t.begin()
+  t.skip().describe('', function() {
+    t.only().test('', function() { throw new Error('Should not be called') })
+    t.only().test('', function() { throw new Error('Should not be called') })
+    t.only().test('', function() { throw new Error('Should not be called') })
+  })
+  t.describe('', function() {
+    t.test('', function() { assertRan++ })
+  })
+  t.test('', function() { assertRan++ })
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 0)
+  assert.strictEqual(assertRan, 2)
+})
+
+e.test('Eltro should support nested skip in describe commands', async function() {
+  testsWereRun = true
+  let assertRan = 0
+  const t = CreateT()
+  t.begin()
+  t.skip().describe('', function() {
+    t.describe('', function() {
+      t.only().test('', function() { throw new Error('Should not be called') })
+      t.only().test('', function() { throw new Error('Should not be called') })
+      t.only().test('', function() { throw new Error('Should not be called') })
+    })
+  })
+  t.describe('', function() {
+    t.test('', function() { assertRan++ })
+  })
+  t.test('', function() { assertRan++ })
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 0)
+  assert.strictEqual(assertRan, 2)
+})
+
+e.test('Eltro should support only tests in front of the test', async function() {
+  testsWereRun = true
+  let assertRan = 0
+  const t = CreateT()
+  t.begin()
+  t.only().describe('', function() {
+    t.test('', function() { assertRan++ })
+    t.test('', function() { assertRan++ })
+  })
+  t.describe('', function() {
+    t.test('a', function() { throw new Error('Should not be called') })
+  })
+  t.test('c', function() { throw new Error('Should not be called') })
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 0, 'failed tests should be 0 but was ' + t.failedTests.length)
+  assert.strictEqual(assertRan, 2)
+})
+
+e.test('Eltro should support nexted only tests in front of the test', async function() {
+  testsWereRun = true
+  let assertRan = 0
+  const t = CreateT()
+  t.begin()
+  t.only().describe('', function() {
+    t.describe('', function() {
+      t.test('', function() { assertRan++ })
+      t.test('', function() { assertRan++ })
+    })
+  })
+  t.describe('', function() {
+    t.test('a', function() { throw new Error('Should not be called') })
+  })
+  t.test('c', function() { throw new Error('Should not be called') })
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 0, 'failed tests should be 0 but was ' + t.failedTests.length)
+  assert.strictEqual(assertRan, 2)
+})
+
+e.test('Eltro should support nested timed out describes', async function() {
+  testsWereRun = true
+  const t = CreateT()
+  t.begin()
+  t.timeout(10).describe('', function() {
+    t.describe('', function() {
+      t.test('', function(cb) { setTimeout(cb, 25) })
+      t.test('', function(cb) { setTimeout(cb, 25) })
+    })
+  })
+  t.describe('', function() {
+    t.test('', function(cb) { setTimeout(cb, 25) })
+  })
+  t.test('', function(cb) { setTimeout(cb, 25) })
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 2)
+  assert.ok(t.failedTests[0].error)
+  assert.match(t.failedTests[0].error.message, /10ms/)
+  assert.ok(t.failedTests[1].error)
+  assert.match(t.failedTests[1].error.message, /10ms/)
+})
+
+e.test('Eltro nested timeout should work as expected', async function() {
+  testsWereRun = true
+  const t = CreateT()
+  t.begin()
+  t.timeout(50).describe('', function() {
+    t.timeout(10).describe('', function() {
+      t.test('', function(cb) { setTimeout(cb, 25) })
+    })
+    t.test('', function(cb) { setTimeout(cb, 25) })
+  })
+  t.describe('', function() {
+    t.test('', function(cb) { setTimeout(cb, 25) })
+  })
+  t.test('', function(cb) { setTimeout(cb, 25) })
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 1)
+  assert.ok(t.failedTests[0].error)
+  assert.match(t.failedTests[0].error.message, /10ms/)
+})
+
 // Extra testing to make sure tests were run at all
 process.on('exit', function(e) {
   try {

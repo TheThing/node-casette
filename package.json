@@ -4,7 +4,7 @@
   "description": "Eltro is a tiny no-dependancy test framework for node",
   "main": "index.mjs",
   "scripts": {
-    "test": "node cli.mjs test/**/*.test.mjs"
+    "test": "node cli.mjs test/**/*.test.mjs -r dot"
   },
   "repository": {
     "type": "git",
