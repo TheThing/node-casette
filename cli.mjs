@@ -8,7 +8,7 @@ import { CLI, printError } from './lib/cli.mjs'
 
 e.begin()
 
-const cli = new CLI(c)
+const cli = new CLI(e)
 cli.parseOptions(args)
 
 if (cli.errored) {
