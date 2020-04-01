@@ -72,6 +72,16 @@ e.describe('CLI', function() {
       assert.deepEqual(cli.targets, ['test/**'])
       assert.notOk(cli.errored)
     })
+
+    e.test('should mark errored if invalid shorthand option', function() {
+      cli.parseOptions(['-A'])
+      assert.ok(cli.errored)
+    })
+
+    e.test('should mark errored if invalid longhand option', function() {
+      cli.parseOptions(['--asdf'])
+      assert.ok(cli.errored)
+    })
   })
 
   /*****************************************

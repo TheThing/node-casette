@@ -27,6 +27,7 @@ function PrintHelp() {
   console.log('eltro test/mytest.mjs')
   console.log('eltro dot test/*.mjs')
   console.log('eltro -r dot test/**/*.test.mjs')
+  console.log('')
   process.exit(1)
 }
 
