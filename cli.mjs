@@ -3,10 +3,10 @@
 // Get arguments
 const [,, ...args] = process.argv
 
-import c from './lib/casette.mjs'
+import e from './lib/eltro.mjs'
 import { CLI, printError } from './lib/cli.mjs'
 
-c.begin()
+e.begin()
 
 const cli = new CLI(c)
 cli.parseOptions(args)
@@ -17,16 +17,16 @@ if (cli.errored) {
 
 function PrintHelp() {
   console.log('')
-  console.log('Usage: casette <options> <files>')
+  console.log('Usage: eltro <options> <files>')
   console.log('')
   console.log('where <files> can either be a single file or a simple glob pattern.')
   console.log('where <options> can be any of the following:')
   console.log('  -r, --reporter - Specify the reporter to use.')
   console.log('      Supported reporters: list, dot')
   console.log('')
-  console.log('casette test/mytest.mjs')
-  console.log('casette dot test/*.mjs')
-  console.log('casette -r dot test/**/*.test.mjs')
+  console.log('eltro test/mytest.mjs')
+  console.log('eltro dot test/*.mjs')
+  console.log('eltro -r dot test/**/*.test.mjs')
   process.exit(1)
 }
 
@@ -38,9 +38,9 @@ cli.processTargets().then(function() {
   }
   return cli.loadFiles()
     .then(function() {
-      c.reporter = cli.reporter
+      e.reporter = cli.reporter
 
-      return c.run()
+      return e.run()
         .catch(function(err) {
           console.log('')
           console.error('\x1b[31mUnknown error occured while running the tests\x1b[0m')

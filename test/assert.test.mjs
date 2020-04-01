@@ -2,7 +2,7 @@ import util from 'util'
 import assert from 'assert'
 import assertExtended from '../lib/assert.mjs'
 
-import c from '../lib/casette.mjs'
+import e from '../lib/eltro.mjs'
 
 const testLongObject = {
   a: 1, b:2, c:3, d:4,
@@ -11,37 +11,37 @@ const testLongObject = {
   g: '32ghaiwugb23 238023'
 }
 
-c.describe('#notOk()', function() {
-  c.test('should exist', function() {
+e.describe('#notOk()', function() {
+  e.test('should exist', function() {
     assertExtended.ok(assertExtended.notOk)
   })
   
-  c.test('should throw for true values', function() {
+  e.test('should throw for true values', function() {
     assertExtended.throws(function() {
       assertExtended.notOk(true)
     }, assertExtended.AssertionError)
   })
   
-  c.test('should pass for false values', function() {
+  e.test('should pass for false values', function() {
     assertExtended.notOk(false)
     assertExtended.notOk(null)
     assertExtended.notOk(0)
   })
 })
 
-c.describe('#isFulfilled()', function() {
-  c.test('should exist', function() {
+e.describe('#isFulfilled()', function() {
+  e.test('should exist', function() {
     assertExtended.ok(assertExtended.isFulfilled)
   })
   
-  c.test('should throw for rejected promises', function() {
+  e.test('should throw for rejected promises', function() {
     return assertExtended.isFulfilled(Promise.reject({}))
       .catch((err) => {
         assertExtended.ok(err.message.match(/promise fail/))
       })
   })
   
-  c.test('should properly parse rejected object response', function() {
+  e.test('should properly parse rejected object response', function() {
     let assertMessage = util.inspect(testLongObject, {depth: 1}).replace(/\n /g, '')
     assertMessage = assertMessage.slice(0, 64) + '...'
   
@@ -51,7 +51,7 @@ c.describe('#isFulfilled()', function() {
       )
   })
   
-  c.test('should include error message if error', function() {
+  e.test('should include error message if error', function() {
     const assertMessage = 'something something dark side'
     return assertExtended.isFulfilled(Promise.reject(new Error(assertMessage)))
       .catch((err) => {
@@ -59,11 +59,11 @@ c.describe('#isFulfilled()', function() {
       })
   })
   
-  c.test('should pass for resolved promises', function() {
+  e.test('should pass for resolved promises', function() {
     return assertExtended.isFulfilled(Promise.resolve())
   })
   
-  c.test('should support custom message', function() {
+  e.test('should support custom message', function() {
     const assertMessage = 'something something dark side'
     return assertExtended.isFulfilled(Promise.reject({}), assertMessage)
       .catch((err) => {
@@ -71,7 +71,7 @@ c.describe('#isFulfilled()', function() {
       })
   })
   
-  c.test('should return result for the resolved promise', function() {
+  e.test('should return result for the resolved promise', function() {
     const assertResult = {a: 1}
   
     return assertExtended.isFulfilled(Promise.resolve(assertResult))
@@ -79,12 +79,12 @@ c.describe('#isFulfilled()', function() {
   })
 })
 
-c.describe('#isRejected()', function() {
-  c.test('should exist', function() {
+e.describe('#isRejected()', function() {
+  e.test('should exist', function() {
     assertExtended.ok(assertExtended.isRejected)
   })
 
-  c.test('should throw for resolved promises', function() {
+  e.test('should throw for resolved promises', function() {
     let hasFailed = false
 
     return assertExtended.isRejected(Promise.resolve({}))
@@ -97,7 +97,7 @@ c.describe('#isRejected()', function() {
       })
   })
 
-  c.test('should properly stringify objects', function() {
+  e.test('should properly stringify objects', function() {
     let assertMessage = util.inspect(testLongObject, {depth: 1}).replace(/\n /g, '')
     assertMessage = assertMessage.slice(0, 64) + '...'
 
@@ -107,13 +107,13 @@ c.describe('#isRejected()', function() {
       )
   })
 
-  c.test('should support custom message', function() {
+  e.test('should support custom message', function() {
     const assertMessage = 'something something dark side'
     return assertExtended.isRejected(Promise.resolve({}), assertMessage)
       .catch((err) => assertExtended.ok(err.message.match(assertMessage)))
   })
 
-  c.test('should return result for the unresolved promise', function() {
+  e.test('should return result for the unresolved promise', function() {
     const assertResult = {a: 1}
 
     return assertExtended.isRejected(Promise.reject(assertResult))
@@ -121,34 +121,34 @@ c.describe('#isRejected()', function() {
   })
 })
 
-c.describe('#match()', function() {
-  c.test('should exist', function() {
+e.describe('#match()', function() {
+  e.test('should exist', function() {
     assertExtended.ok(assertExtended.match);
   });
 
-  c.test('should throw if no match', function() {
+  e.test('should throw if no match', function() {
     assertExtended.throws(function() {
       assertExtended.match('a', /b/);
     }, assertExtended.AssertionError);
   });
 
-  c.test('should pass if matches', function() {
+  e.test('should pass if matches', function() {
     assertExtended.match('a', /a/);
   });
 })
 
-c.describe('#notMatch()', function() {
-  c.test('should exist', function() {
+e.describe('#notMatch()', function() {
+  e.test('should exist', function() {
     assertExtended.ok(assertExtended.notMatch);
   });
 
-  c.test('should throw if match', function() {
+  e.test('should throw if match', function() {
     assertExtended.throws(function() {
       assertExtended.notMatch('a', /a/);
     }, assertExtended.AssertionError);
   });
 
-  c.test('should pass if not matches', function() {
+  e.test('should pass if not matches', function() {
     assertExtended.notMatch('a', /b/);
   });
 })

@@ -1,16 +1,16 @@
-import c from '../lib/casette.mjs'
+import e from '../lib/eltro.mjs'
 import assert from '../lib/assert.mjs'
 import { printError } from '../lib/cli.mjs'
 
 let testsWereRun = false
 
 function CreateT() {
-  const t = new c.Casette()
+  const t = new e.Eltro()
   t.reporter = ''
   return t
 }
 
-c.test('Casette describe should add prefix to the group tests', async function() {
+e.test('Eltro describe should add prefix to the group tests', async function() {
   testsWereRun = true
   const assertPrefix = 'something'
   const assertName = 'blabla'
@@ -26,7 +26,7 @@ c.test('Casette describe should add prefix to the group tests', async function()
   assert.strictEqual(t.groupsFlat[0].tests[0].name, assertPrefix + ' ' + assertName)
 })
 
-c.test('Casette describe should add prefix to individual tests', async function() {
+e.test('Eltro describe should add prefix to individual tests', async function() {
   testsWereRun = true
   const assertPrefix = 'something'
   const assertName = 'blabla'
@@ -40,7 +40,7 @@ c.test('Casette describe should add prefix to individual tests', async function(
   assert.strictEqual(t.tests[0].name, assertPrefix + ' ' + assertName)
 })
 
-c.test('Casette describe should support multiple describe', async function() {
+e.test('Eltro describe should support multiple describe', async function() {
   testsWereRun = true
   const assertPrefix = 'something'
   const assertPrefix2 = 'else'
@@ -57,7 +57,7 @@ c.test('Casette describe should support multiple describe', async function() {
   assert.strictEqual(t.tests[0].name, assertPrefix + ' ' + assertPrefix2 + ' ' + assertName)
 })
 
-c.test('Casette should run test', async function() {
+e.test('Eltro should run test', async function() {
   testsWereRun = true
   let assertIsTrue = false
   const t = CreateT()
@@ -70,7 +70,7 @@ c.test('Casette should run test', async function() {
   assert.strictEqual(assertIsTrue, true)
 })
 
-c.test('Casette should run promised test', async function() {
+e.test('Eltro should run promised test', async function() {
   testsWereRun = true
   let assertIsTrue = false
   const t = CreateT()
@@ -86,7 +86,7 @@ c.test('Casette should run promised test', async function() {
   assert.strictEqual(assertIsTrue, true)
 })
 
-c.test('Casette should support callback', async function() {
+e.test('Eltro should support callback', async function() {
   testsWereRun = true
   let assertIsTrue = false
   const t = CreateT()
@@ -102,7 +102,7 @@ c.test('Casette should support callback', async function() {
   assert.strictEqual(assertIsTrue, true)
 })
 
-c.test('Casette should support directly thrown errors', async function() {
+e.test('Eltro should support directly thrown errors', async function() {
   testsWereRun = true
   const assertError = new Error()
   const t = CreateT()
@@ -115,7 +115,7 @@ c.test('Casette should support directly thrown errors', async function() {
   assert.strictEqual(t.failedTests[0].error, assertError)
 })
 
-c.test('Casette should support promise rejected errors', async function() {
+e.test('Eltro should support promise rejected errors', async function() {
   testsWereRun = true
   const assertError = new Error()
   const t = CreateT()
@@ -130,7 +130,7 @@ c.test('Casette should support promise rejected errors', async function() {
   assert.strictEqual(t.failedTests[0].error, assertError)
 })
 
-c.test('Casette should support callback rejected errors', async function() {
+e.test('Eltro should support callback rejected errors', async function() {
   testsWereRun = true
   const assertError = new Error()
   const t = CreateT()
@@ -143,7 +143,7 @@ c.test('Casette should support callback rejected errors', async function() {
   assert.strictEqual(t.failedTests[0].error, assertError)
 })
 
-c.test('Casette should support timing out tests', async function() {
+e.test('Eltro should support timing out tests', async function() {
   testsWereRun = true
   const t = CreateT()
   t.begin()
@@ -154,7 +154,7 @@ c.test('Casette should support timing out tests', async function() {
   assert.match(t.failedTests[0].error.message, /50ms/)
 })
 
-c.test('Casette should support timed out tests on late tests', async function() {
+e.test('Eltro should support timed out tests on late tests', async function() {
   testsWereRun = true
   const t = CreateT()
   t.begin()
@@ -169,7 +169,7 @@ c.test('Casette should support timed out tests on late tests', async function() 
   assert.match(t.failedTests[0].error.message, /50ms/)
 })
 
-c.test('Casette should support skipped tests', async function() {
+e.test('Eltro should support skipped tests', async function() {
   testsWereRun = true
   const t = CreateT()
   t.begin()

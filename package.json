@@ -1,14 +1,14 @@
 {
-  "name": "casette",
+  "name": "eltro",
   "version": "0.9.2",
-  "description": "No-dependancy test framework for node",
+  "description": "Eltro is a small no-dependancy test framework for node",
   "main": "index.mjs",
   "scripts": {
     "test": "node cli.mjs test/**/*.test.mjs"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TheThing/node-casette.git"
+    "url": "git+https://github.com/TheThing/node-eltro.git"
   },
   "keywords": [
     "test",
@@ -20,11 +20,11 @@
   "author": "Jonatan Nilsson",
   "license": "WTFPL",
   "bugs": {
-    "url": "https://github.com/TheThing/node-casette/issues"
+    "url": "https://github.com/TheThing/node-eltro/issues"
   },
-  "homepage": "https://github.com/TheThing/node-casette#readme",
+  "homepage": "https://github.com/TheThing/node-eltro#readme",
   "bin": {
-    "casette": "./cli.mjs"
+    "eltro": "./cli.mjs"
   },
   "files": [
     "index.mjs",
