@@ -1,6 +1,6 @@
 {
   "name": "eltro",
-  "version": "0.9.1",
+  "version": "1.0.0",
   "description": "Eltro is a tiny no-dependancy test framework for node",
   "main": "index.mjs",
   "scripts": {

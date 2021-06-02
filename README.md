@@ -1,5 +1,5 @@
 # eltro
-Eltro is a no-nonsense, no dependancy small test framework created to use in node 13 with ECM.
+Eltro is a no-nonsense, no dependancy, small test framework created to use in node 13 or higher using ECM modules.
 
 # Installation
 
@@ -22,7 +22,7 @@ $ npm install --save-dev eltro
 $ mkdir test
 ```
 
-Next in your favourite editor, create `test/test.js`:
+Next in your favourite editor, create `test/test.mjs`:
 
 ```node
 import { Eltro as t, assert} from 'eltro'
@@ -36,11 +36,11 @@ t.describe('Array', function() {
 })
 ```
 
-Set up a test script in packagt.json:
+Set up a test script in package.json:
 
 ```json
 "scripts": {
-  "test": "mocha"
+  "test": "eltro"
 }
 ```
 

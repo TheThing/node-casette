@@ -6,10 +6,11 @@ t.describe('CLI', function() {
   let cli = new CLI()
 
   t.test('#constructor() give default options', function() {
-    assert.strictEqual(cli.reporter, 'list')
-    assert.deepEqual(cli.targets, ['test/**'])
-    assert.deepEqual(cli.files, [])
-    assert.notOk(cli.errored)
+    let cliTest = new CLI()
+    assert.strictEqual(cliTest.reporter, 'list')
+    assert.deepEqual(cliTest.targets, ['test/**'])
+    assert.deepEqual(cliTest.files, [])
+    assert.notOk(cliTest.errored)
   })
 
   /*****************************************
@@ -110,6 +111,7 @@ t.describe('CLI', function() {
       await cli.processTargets()
     
       assert.strictEqual(cli.files.length, 2)
+      cli.files.sort()
       assert.strictEqual(cli.files[0], 'test/folder1/sampletest1.temp.mjs')
       assert.strictEqual(cli.files[1], 'test/folder1/sampletest2.temp.mjs')
     })
@@ -119,6 +121,7 @@ t.describe('CLI', function() {
       await cli.processTargets()
     
       assert.strictEqual(cli.files.length, 2)
+      cli.files.sort()
       assert.strictEqual(cli.files[0], 'test/folder1/sampletest1.temp.mjs')
       assert.strictEqual(cli.files[1], 'test/folder1/sampletest2.temp.mjs')
     })
@@ -187,24 +190,12 @@ t.describe('CLI', function() {
       }
     
       for (let i = 0; i < cli.files.length; i++) {
-        if (cli.files[i] === 'test/folder1/sampletest1.temp.mjs') {
-          found.sampletest1 = true
-        }
-        if (cli.files[i] === 'test/folder1/sampletest2.temp.mjs') {
-          found.sampletest2 = true
-        }
-        if (cli.files[i] === 'test/folder2/sampletest3.temp.mjs') {
-          found.sampletest3 = true
-        }
-        if (cli.files[i] === 'test/folder2/sampletest4.temp.mjs') {
-          found.sampletest4 = true
-        }
-        if (cli.files[i] === 'test/folder2/sampletest5.temp.txt') {
-          found.sampletest5 = true
-        }
-        if (cli.files[i] === 'test/cli.test.mjs') {
-          found.cli = true
-        }
+        found.sampletest1 = found.sampletest1 || cli.files[i] === 'test/folder1/sampletest1.temp.mjs'
+        found.sampletest2 = found.sampletest2 || cli.files[i] === 'test/folder1/sampletest2.temp.mjs'
+        found.sampletest3 = found.sampletest3 || cli.files[i] === 'test/folder2/sampletest3.temp.mjs'
+        found.sampletest4 = found.sampletest4 || cli.files[i] === 'test/folder2/sampletest4.temp.mjs'
+        found.sampletest5 = found.sampletest5 || cli.files[i] === 'test/folder2/sampletest5.temp.txt'
+        found.cli = found.cli || cli.files[i] === 'test/cli.test.mjs'
       }
     
       assert.deepEqual(found, {
@@ -233,24 +224,12 @@ t.describe('CLI', function() {
       }
     
       for (let i = 0; i < cli.files.length; i++) {
-        if (cli.files[i] === 'test/folder1/sampletest1.temp.mjs') {
-          found.sampletest1 = true
-        }
-        if (cli.files[i] === 'test/folder1/sampletest2.temp.mjs') {
-          found.sampletest2 = true
-        }
-        if (cli.files[i] === 'test/folder2/sampletest3.temp.mjs') {
-          found.sampletest3 = true
-        }
-        if (cli.files[i] === 'test/folder2/sampletest4.temp.mjs') {
-          found.sampletest4 = true
-        }
-        if (cli.files[i] === 'test/folder2/sampletest5.temp.txt') {
-          found.sampletest5 = true
-        }
-        if (cli.files[i] === 'test/cli.test.mjs') {
-          found.cli = true
-        }
+        found.sampletest1 = found.sampletest1 || cli.files[i] === 'test/folder1/sampletest1.temp.mjs'
+        found.sampletest2 = found.sampletest2 || cli.files[i] === 'test/folder1/sampletest2.temp.mjs'
+        found.sampletest3 = found.sampletest3 || cli.files[i] === 'test/folder2/sampletest3.temp.mjs'
+        found.sampletest4 = found.sampletest4 || cli.files[i] === 'test/folder2/sampletest4.temp.mjs'
+        found.sampletest5 = found.sampletest5 || cli.files[i] === 'test/folder2/sampletest5.temp.txt'
+        found.cli = found.cli || cli.files[i] === 'test/cli.test.mjs'
       }
     
       assert.deepEqual(found, {
