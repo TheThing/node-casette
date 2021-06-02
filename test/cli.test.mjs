@@ -241,7 +241,7 @@ t.describe('CLI', function() {
         cli: true
       })
     })
-  })  
+  })
 })
 
 t.test('#fileMatches() should support filename matching with glob pattern', async function() {
