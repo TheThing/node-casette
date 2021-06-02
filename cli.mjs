@@ -50,8 +50,8 @@ cli.processTargets().then(function() {
         })
     }, function(err) {
       console.log('')
-      console.error('\x1b[31mUnknown error while opening files\x1b[0m')
-      printError(err)
+      console.error('\x1b[31m' + err.message + '\x1b[0m')
+      printError(err.inner)
       process.exit(1)
     })
 }, function(err) {
