@@ -62,4 +62,7 @@ cli.processTargets().then(function() {
 })
 .then(function() {
   process.exit(0)
+}, function(err) {
+  console.error('\x1b[31mInternal error occured:\x1b[0m', err)
+  process.exit(2)
 })

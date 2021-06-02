@@ -26,3 +26,26 @@ e.test('Eltro should support any value in promise fail', async function() {
     assert.ok(t.failedTests[x].error.stack)
   }
 })
+
+e.test('Eltro should support any value in throws', async function() {
+  const t = CreateT()
+  t.begin()
+  t.describe('', function() {
+    t.test('a', function() { throw null })
+    t.test('b', function() { throw {} })
+    t.test('c', function() { throw { message: 'test' } })
+    t.test('d', function() { throw 1234 })
+    t.test('e', async function() { throw null })
+    t.test('f', async function() { throw {} })
+    t.test('g', async function() { throw { message: 'test' } })
+    t.test('h', async function() { throw 1234 })
+  })
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 8)
+
+  for (let x = 0; x < t.failedTests.length; x++) {
+    assert.strictEqual(typeof(t.failedTests[x].error), 'object')
+    assert.ok(t.failedTests[x].error.message)
+    assert.ok(t.failedTests[x].error.stack)
+  }
+})
