@@ -28,10 +28,18 @@ Next in your favourite editor, create `test/test.mjs`:
 import { Eltro as t, assert} from 'eltro'
 
 t.describe('Array', function() {
+  t.before(function() {
+    // Prepare our test if needed
+  })
+
   t.describe('#indexOf()', function() {
     t.test('should return -1 when value is not present', function() {
       assert.equal([1,2,3].indexOf(4), -1)
     })
+  })
+
+  t.after(function() {
+    // Cleanup after if needed
   })
 })
 ```
@@ -140,12 +148,12 @@ import { Eltro as t, assert} from 'eltro'
 
 function someFunction() { return true }
 
-t.test('#someFunction()', function() {
+t.describe('#someFunction()', function() {
   t.test('should always return true', function() {
     assert.strictEqual(someFunction(), true)
     assert.strictEqual(someFunction(), true)
     assert.strictEqual(someFunction(), true)
-  }).skip()
+  })
 })
 ```
 
@@ -153,6 +161,70 @@ will output:
 
 ```bash
     √ #someFunction() should always return true
+```
+
+### t.before(func)
+
+Queue up the `func` to run before any test or groups within current active group.
+
+```node
+import { Eltro as t, assert} from 'eltro'
+
+t.before(function() {
+  // Prepare something before we start any of the below tests
+})
+
+t.describe('#myTest()', function() {
+  t.before(function() {
+    // Runs before the test below
+  })
+
+  t.test('true should always be true', function() {
+    assert.strictEqual(true, true)
+  })
+})
+
+t.describe('#anotherTest()', function() {
+  t.before(function() {
+    // Runs before the test below
+  })
+
+  t.test('false should always be false', function() {
+    assert.strictEqual(false, false)
+  })
+})
+```
+
+### t.after(func)
+
+Queue up the `func` to run after any test or groups within current active group.
+
+```node
+import { Eltro as t, assert} from 'eltro'
+
+t.after(function() {
+  // After we finish all the tests below, this gets run
+})
+
+t.describe('#myTest()', function() {
+  t.after(function() {
+    // Runs after the test below
+  })
+
+  t.test('true should always be true', function() {
+    assert.strictEqual(true, true)
+  })
+})
+
+t.describe('#anotherTest()', function() {
+  t.after(function() {
+    // Runs after the test below
+  })
+
+  t.test('false should always be false', function() {
+    assert.strictEqual(false, false)
+  })
+})
 ```
 
 ### t.only()

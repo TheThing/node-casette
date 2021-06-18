@@ -224,6 +224,22 @@ e.test('Eltro should support timed out tests on late tests', async function() {
   assert.match(t.failedTests[0].error.message, /50ms/)
 })
 
+e.test('Eltro should support timed out tests in front', async function() {
+  testsWereRun = true
+  const t = CreateT()
+  t.begin()
+
+  t.describe('', function() {
+    t.timeout(25).test('', function(cb) { setTimeout(cb, 50) })
+    t.test('', function(cb) { setTimeout(cb, 50) })
+  })
+
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 1)
+  assert.ok(t.failedTests[0].error)
+  assert.match(t.failedTests[0].error.message, /25ms/)
+})
+
 e.test('Eltro should support skipped tests', async function() {
   testsWereRun = true
   const t = CreateT()
@@ -252,22 +268,6 @@ e.test('Eltro should support only tests', async function() {
   assert.strictEqual(assertIsTrue, true)
 })
 
-e.test('Eltro should support timed out tests in front', async function() {
-  testsWereRun = true
-  const t = CreateT()
-  t.begin()
-
-  t.describe('', function() {
-    t.timeout(25).test('', function(cb) { setTimeout(cb, 50) })
-    t.test('', function(cb) { setTimeout(cb, 50) })
-  })
-
-  await t.run()
-  assert.strictEqual(t.failedTests.length, 1)
-  assert.ok(t.failedTests[0].error)
-  assert.match(t.failedTests[0].error.message, /25ms/)
-})
-
 e.test('Eltro should support skipped tests in front of the test', async function() {
   testsWereRun = true
   let assertIsTrue = false
@@ -281,6 +281,380 @@ e.test('Eltro should support skipped tests in front of the test', async function
   await t.run()
   assert.strictEqual(t.failedTests.length, 0)
   assert.strictEqual(assertIsTrue, true)
+})
+
+e.test('Eltro should support before() functions in describe group', async function() {
+  testsWereRun = true
+  let assertRan = 0
+  let firstBefore = 0
+  let secondBefore = 0
+  let thirdBefore = 0
+  const t = CreateT()
+  t.begin()
+  t.describe('', function() {
+    t.before(function() {
+      firstBefore = assertRan
+    })
+
+    t.describe('', function() {
+      t.before(function() {
+        secondBefore = assertRan
+      })
+
+      t.test('', function() { assertRan++ })
+      t.test('', function() { assertRan++ })
+      t.test('', function() { assertRan++ })
+    })
+
+    t.describe('', function() {      
+      t.before(function() {
+        thirdBefore = assertRan
+      })
+
+      t.test('', function() { assertRan++ })
+    })
+
+    t.test('', function() { assertRan++ })
+  })
+  let stats = await t.run()
+  assert.strictEqual(t.failedTests.length, 0)
+  assert.strictEqual(assertRan, 5)
+  assert.strictEqual(stats.passed, 5)
+  assert.strictEqual(firstBefore, 0)
+  assert.strictEqual(secondBefore, 1)
+  assert.strictEqual(thirdBefore, 4)
+})
+
+e.test('Eltro should support before() functions in describe, timing out', async function() {
+  testsWereRun = true
+  let assertRan = 0
+  const t = CreateT()
+  t.begin()
+  t.describe('', function() {
+    t.before(function(cb) { }).timeout(50)
+    t.test('', function() { assertRan++ })
+  })
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 1)
+  assert.ok(t.failedTests[0].error)
+  assert.match(t.failedTests[0].error.message, /50ms/)
+  assert.strictEqual(assertRan, 0)
+})
+
+e.test('Eltro should support before() functions in describe, late timing out', async function() {
+  testsWereRun = true
+  let assertRan = 0
+  const t = CreateT()
+  t.begin()
+  t.describe('', function() {
+    t.before(function(cb) {
+      setTimeout(cb, 100)
+    }).timeout(50)
+    t.test('', function() { assertRan++ })
+  })
+  t.describe('', function() {
+    t.test('', function(cb) { assertRan++; setTimeout(cb, 25) })
+    t.test('', function(cb) { assertRan++; setTimeout(cb, 25) })
+  })
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 1)
+  assert.ok(t.failedTests[0].error)
+  assert.match(t.failedTests[0].error.message, /50ms/)
+  assert.strictEqual(assertRan, 2)
+})
+
+e.test('Eltro should support before() functions in describe, timing out in front', async function() {
+  testsWereRun = true
+  let assertRan = 0
+  const t = CreateT()
+  t.begin()
+  t.describe('', function() {
+    t.timeout(25).before(function(cb) { setTimeout(cb, 50) })
+    t.test('', function() { assertRan++ })
+  })
+  t.describe('', function() {
+    t.test('', function(cb) { assertRan++; setTimeout(cb, 25) })
+    t.test('', function(cb) { assertRan++; setTimeout(cb, 25) })
+  })
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 1)
+  assert.ok(t.failedTests[0].error)
+  assert.match(t.failedTests[0].error.message, /25ms/)
+  assert.strictEqual(assertRan, 2)
+})
+
+e.test('Eltro should support before() functions in describe, being promised', async function() {
+  testsWereRun = true
+  let assertIsTrue = false
+  const t = CreateT()
+  t.begin()
+  t.describe('', function() {
+    t.before(function() {
+      return new Promise(function(res) {
+        assertIsTrue = true
+        res()
+      })
+    })
+    t.test('', function() { })
+  })
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 0)
+  assert.strictEqual(assertIsTrue, true)
+})
+
+e.test('Eltro should support before() functions in describe, support callback', async function() {
+  testsWereRun = true
+  let assertIsTrue = false
+  const t = CreateT()
+  t.begin()
+  t.describe('', function() {
+    t.before(function(cb) {
+      setTimeout(function() {
+        assertIsTrue = true
+        cb()
+      }, 25)
+    })
+    t.test('', function() { })
+  })
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 0)
+  assert.strictEqual(assertIsTrue, true)
+})
+
+e.test('Eltro should support before() functions in describe, support directly thrown errors', async function() {
+  testsWereRun = true
+  const assertError = new Error()
+  const t = CreateT()
+  t.begin()
+  t.describe('', function() {
+    t.before(function() {
+      throw assertError
+    })
+    t.test('', function() { })
+  })
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 1)
+  assert.strictEqual(t.failedTests[0].error, assertError)
+})
+
+e.test('Eltro should support before() functions in describe, support rejected promises', async function() {
+  testsWereRun = true
+  const assertError = new Error()
+  const t = CreateT()
+  t.begin()
+  t.describe('', function() {
+    t.before(function() {
+      return new Promise(function(res, rej) {
+        rej(assertError)
+      })
+    })
+    t.test('', function() {})
+  })
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 1)
+  assert.strictEqual(t.failedTests[0].error, assertError)
+})
+
+e.test('Eltro should support before() functions in describe, support callback rejected', async function() {
+  testsWereRun = true
+  const assertError = new Error()
+  const t = CreateT()
+  t.begin()
+  t.describe('', function() {
+    t.before(function(cb) { cb(assertError) })
+    t.test('', function() { })
+  })
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 1)
+  assert.strictEqual(t.failedTests[0].error, assertError)
+})
+
+
+e.test('Eltro should support after() functions in describe group', async function() {
+  testsWereRun = true
+  let assertRan = 0
+  let firstAfter = 0
+  let secondAfter = 0
+  let thirdAfter = 0
+  const t = CreateT()
+  t.begin()
+  t.describe('', function() {
+    t.after(function() {
+      firstAfter = assertRan
+    })
+
+    t.describe('', function() {
+      t.after(function() {
+        secondAfter = assertRan
+      })
+
+      t.test('', function() { assertRan++ })
+      t.test('', function() { assertRan++ })
+      t.test('', function() { assertRan++ })
+    })
+
+    t.describe('', function() {      
+      t.after(function() {
+        thirdAfter = assertRan
+      })
+
+      t.test('', function() { assertRan++ })
+    })
+
+    t.test('', function() { assertRan++ })
+  })
+  let stats = await t.run()
+  assert.strictEqual(t.failedTests.length, 0)
+  assert.strictEqual(stats.passed, 5)
+  assert.strictEqual(assertRan, 5)
+  assert.strictEqual(firstAfter, 5)
+  assert.strictEqual(secondAfter, 4)
+  assert.strictEqual(thirdAfter, 5)
+})
+
+e.test('Eltro should support after() functions in describe, timing out', async function() {
+  testsWereRun = true
+  let assertRan = 0
+  const t = CreateT()
+  t.begin()
+  t.describe('', function() {
+    t.after(function(cb) { }).timeout(50)
+    t.test('', function() { assertRan++ })
+  })
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 1)
+  assert.ok(t.failedTests[0].error)
+  assert.match(t.failedTests[0].error.message, /50ms/)
+  assert.strictEqual(assertRan, 1)
+})
+
+e.test('Eltro should support after() functions in describe, late timing out', async function() {
+  testsWereRun = true
+  let assertRan = 0
+  const t = CreateT()
+  t.begin()
+  t.describe('', function() {
+    t.after(function(cb) {
+      setTimeout(cb, 100)
+    }).timeout(50)
+    t.test('', function() { assertRan++ })
+  })
+  t.describe('', function() {
+    t.test('', function(cb) { assertRan++; setTimeout(cb, 25) })
+    t.test('', function(cb) { assertRan++; setTimeout(cb, 25) })
+  })
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 1)
+  assert.ok(t.failedTests[0].error)
+  assert.match(t.failedTests[0].error.message, /50ms/)
+  assert.strictEqual(assertRan, 3)
+})
+
+e.test('Eltro should support after() functions in describe, timing out in front', async function() {
+  testsWereRun = true
+  let assertRan = 0
+  const t = CreateT()
+  t.begin()
+  t.describe('', function() {
+    t.timeout(25).after(function(cb) { setTimeout(cb, 50) })
+    t.test('', function() { assertRan++ })
+  })
+  t.describe('', function() {
+    t.test('', function(cb) { assertRan++; setTimeout(cb, 25) })
+    t.test('', function(cb) { assertRan++; setTimeout(cb, 25) })
+  })
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 1)
+  assert.ok(t.failedTests[0].error)
+  assert.match(t.failedTests[0].error.message, /25ms/)
+  assert.strictEqual(assertRan, 3)
+})
+
+
+e.test('Eltro should support after() functions in describe, being promised', async function() {
+  testsWereRun = true
+  let assertIsTrue = false
+  const t = CreateT()
+  t.begin()
+  t.describe('', function() {
+    t.after(function() {
+      return new Promise(function(res) {
+        assertIsTrue = true
+        res()
+      })
+    })
+    t.test('', function() { })
+  })
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 0)
+  assert.strictEqual(assertIsTrue, true)
+})
+
+e.test('Eltro should support after() functions in describe, support callback', async function() {
+  testsWereRun = true
+  let assertIsTrue = false
+  const t = CreateT()
+  t.begin()
+  t.describe('', function() {
+    t.after(function(cb) {
+      setTimeout(function() {
+        assertIsTrue = true
+        cb()
+      }, 25)
+    })
+    t.test('', function() { })
+  })
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 0)
+  assert.strictEqual(assertIsTrue, true)
+})
+
+e.test('Eltro should support after() functions in describe, support directly thrown errors', async function() {
+  testsWereRun = true
+  const assertError = new Error()
+  const t = CreateT()
+  t.begin()
+  t.describe('', function() {
+    t.after(function() {
+      throw assertError
+    })
+    t.test('', function() { })
+  })
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 1)
+  assert.strictEqual(t.failedTests[0].error, assertError)
+})
+
+e.test('Eltro should support after() functions in describe, support rejected promises', async function() {
+  testsWereRun = true
+  const assertError = new Error()
+  const t = CreateT()
+  t.begin()
+  t.describe('', function() {
+    t.after(function() {
+      return new Promise(function(res, rej) {
+        rej(assertError)
+      })
+    })
+    t.test('', function() {})
+  })
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 1)
+  assert.strictEqual(t.failedTests[0].error, assertError)
+})
+
+e.test('Eltro should support after() functions in describe, support callback rejected', async function() {
+  testsWereRun = true
+  const assertError = new Error()
+  const t = CreateT()
+  t.begin()
+  t.describe('', function() {
+    t.after(function(cb) { cb(assertError) })
+    t.test('', function() { })
+  })
+  await t.run()
+  assert.strictEqual(t.failedTests.length, 1)
+  assert.strictEqual(t.failedTests[0].error, assertError)
 })
 
 e.test('Eltro should support only tests in front of the test', async function() {
